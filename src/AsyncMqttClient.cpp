@@ -130,6 +130,12 @@ AsyncMqttClient& AsyncMqttClient::setSecure(bool secure) {
   return *this;
 }
 
+#ifdef ESP32
+AsyncMqttClient& AsyncMqttClient::setRootCa(const char* rootca, const size_t len) {
+  _client.setRootCa(rootca, len);
+  return *this;
+}
+#else
 AsyncMqttClient& AsyncMqttClient::addServerFingerprint(const uint8_t* fingerprint) {
   std::array<uint8_t, SHA1_SIZE> newFingerprint;
   memcpy(newFingerprint.data(), fingerprint, SHA1_SIZE);
@@ -186,7 +192,7 @@ void AsyncMqttClient::_clear() {
 /* TCP */
 void AsyncMqttClient::_onConnect() {
   log_i("TCP conn, MQTT CONNECT");
-#if ASYNC_TCP_SSL_ENABLED
+#if ASYNC_TCP_SSL_ENABLED && !defined(ESP32)
   if (_secure && _secureServerFingerprints.size() > 0) {
     SSL* clientSsl = _client.getSSL();
 

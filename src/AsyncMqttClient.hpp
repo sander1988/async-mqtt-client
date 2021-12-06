@@ -19,7 +19,11 @@
 #endif
 
 #if ASYNC_TCP_SSL_ENABLED
+#ifdef ESP32
+#include <tcp_mbedtls.h>
+#else
 #include <tcp_axtls.h>
+#endif
 #define SHA1_SIZE 20
 #endif
 
@@ -65,7 +69,11 @@ class AsyncMqttClient {
   AsyncMqttClient& setServer(const char* host, uint16_t port);
 #if ASYNC_TCP_SSL_ENABLED
   AsyncMqttClient& setSecure(bool secure);
+#ifdef ESP32
+  AsyncMqttClient& setRootCa(const char* rootca, const size_t len);
+#else
   AsyncMqttClient& addServerFingerprint(const uint8_t* fingerprint);
+#endif
 #endif
 
   AsyncMqttClient& onConnect(AsyncMqttClientInternals::OnConnectUserCallback callback);
